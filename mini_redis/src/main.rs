@@ -35,7 +35,11 @@ struct Reponse {
 async fn process_command(line: String, store: Store) -> Option<Reponse>
 {
     println!("{}", line);
-    let deserialized: Requete = serde_json::from_str(&line).expect("no panik");
+    let deserialized: Requete = match serde_json::from_str(&line) {
+        Ok(d) => d,
+        Err(_e) => return Some(Reponse {status: "error".to_string(), value: None, count: None, keys: None, ttl: None, message: Some("serialization failed".to_string())}),
+    };
+
 
     match deserialized.cmd.as_str() {
         "PING" => Some(Reponse {status: "ok".to_string(), value: None, count: None, keys: None, ttl: None, message: None}),
